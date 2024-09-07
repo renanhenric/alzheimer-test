@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import cv2 as cv
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
@@ -13,7 +14,7 @@ from PIL import Image
 # Redução da resolução de imagem para 64x64
 image_size = (64, 64)
 
-# Função para carregar imagens e labels usando Pillow
+# Função para carregar imagens e labels
 def load_images(data_dir, categories, image_size):
     data = []
     labels = []
@@ -22,10 +23,8 @@ def load_images(data_dir, categories, image_size):
         class_num = categories.index(category)
         for img in os.listdir(path):
             try:
-                img_path = os.path.join(path, img)
-                img = Image.open(img_path)
-                img = img.resize(image_size)
-                img_array = np.array(img)
+                img_array = cv.imread(os.path.join(path, img), cv.IMREAD_COLOR)
+                img_array = cv.resize(img_array, image_size)
                 data.append(img_array)
                 labels.append(class_num)
             except Exception as e:
@@ -135,3 +134,4 @@ st.write("Histórico de diagnósticos:")
 for diag in st.session_state['diagnosticos']:
     st.image(diag['imagem'], width=100)
     st.write(f"Diagnóstico: {diag['diagnóstico']} - Confiança: {diag['confiança']:.2f}")
+
